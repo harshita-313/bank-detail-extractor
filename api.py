@@ -11,6 +11,7 @@ def extract_pdf():
 
     file = request.files["file"]
 
+    # Read PDF
     pdf_reader = PyPDF2.PdfReader(file)
     text = ""
     for page in pdf_reader.pages:
@@ -46,12 +47,30 @@ def extract_pdf():
         account_holder[key] = match.group(1).strip() if match else "Not found"
 
     # -------------------
+    # Extract Transactions
+    # Example format: "25-04-2024  POS Purchase  4347.35  Debit   27"
+    # -------------------
+    transaction_pattern = r"(\d{2}-\d{2}-\d{4})\s+(.+?)\s+([\d,]+\.\d{2})\s+(Debit|Credit)\s+([\d,]+\.\d{2}|\d+)"
+    transactions = []
+    for match in re.finditer(transaction_pattern, text):
+        date, description, amount, tx_type, balance = match.groups()
+        transactions.append({
+            "Date": date.strip(),
+            "Description": description.strip(),
+            "Amount": amount.strip(),
+            "Type": tx_type.strip(),
+            "Balance": balance.strip()
+        })
+
+    # -------------------
     structured_data = {
         "Account Holder Details": account_holder,
-        "Bank Account Details": bank_details
+        "Bank Account Details": bank_details,
+        "Transactions": transactions
     }
 
     return jsonify(structured_data)
 
 if __name__ == "__main__":
     app.run(debug=True)
+
