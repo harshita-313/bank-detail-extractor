@@ -1,0 +1,46 @@
+{
+	"info": {
+		"_postman_id": "4cb7eb7e-c5ca-43db-8f80-1f1baa9b7791",
+		"name": "Bank PDF Extractor API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "47594353",
+		"_collection_link": "https://harshitathakur484-9639286.postman.co/workspace/Harshita-thakur's-Workspace~6ec06cf6-9db4-4d0e-8823-68bebb51be42/collection/47594353-4cb7eb7e-c5ca-43db-8f80-1f1baa9b7791?action=share&source=collection_link&creator=47594353"
+	},
+	"item": [
+		{
+			"name": "http://127.0.0.1:5000/extract-pdf",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "file",
+							"type": "file",
+							"src": "/C:/Users/harsh/Downloads/bank_statement.pdf"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://127.0.0.1:5000/extract-pdf",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"extract-pdf"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
