@@ -18,25 +18,35 @@ def analyze_with_gemini(text):
 
     prompt = f"""
     You are a financial data analyst.
-    Extract account holder and bank details from the following text, and return in JSON:
 
-    {text}
+    Extract the following from the text below:
 
-    The JSON format should be:
+    1. Account Holder Details: Name, Address, Contact, Email
+    2. Bank Account Details: Account Number, IFSC, Branch Name, Branch Address
+    3. Transactions: list all transactions in a table with columns: Date, Description, Deposits, Withdrawals, Balance
+
+    Return the output in JSON format like this:
+
     {{
-      "Account Holder Details": {{
-          "Name": "",
-          "Address": "",
-          "Contact": "",
-          "Email": ""
-      }},
-      "Bank Account Details": {{
-          "Account Number": "",
-          "IFSC": "",
-          "Branch Name": "",
-          "Branch Address": ""
-      }}
+    "Account Holder Details": {{
+        "Name": "",
+        "Address": "",
+        "Contact": "",
+        "Email": ""
+    }},
+    "Bank Account Details": {{
+        "Account Number": "",
+        "IFSC": "",
+        "Branch Name": "",
+        "Branch Address": ""
+    }},
+    "Transactions": [
+        {{"Date": "", "Description": "", "Deposits": "", "Withdrawals": "", "Balance": ""}}
+    ]
     }}
+
+    Text:
+    {text}
     """
 
     # Instantiate model
