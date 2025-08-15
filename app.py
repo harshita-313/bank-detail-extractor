@@ -13,7 +13,7 @@ st.title("📄 Bank Statement Data Extractor")
 # ----------------------
 # FILE UPLOAD
 # ----------------------
-file = st.file_uploader("Upload your bank statement (PDF)", type="pdf")
+file = st.file_uploader(" your bank statement (PDF)", type="pdf")
 
 if file is not None:
     # ----------------------
@@ -115,3 +115,4 @@ if file is not None:
         st.download_button("📥 Download Transactions as CSV", csv_data, "transactions.csv")
     else:
         st.warning("No transactions found from Gemini AI")
+
