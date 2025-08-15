@@ -62,46 +62,56 @@ if file is not None:
     # ----------------------
     # TRANSACTION EXTRACTION
     # ----------------------
-    transaction_pattern = r"(\d{2}-\d{2}-\d{4})\s+([A-Za-z\s]+)\s+(\d+\.\d{2})\s+(Debit|Credit)\s+(\d+\.\d{2})"
+    transaction_pattern = r"(\d{2}-\d{2}-\d{4})\s+(.+?)\s+(\d+(?:\.\d{2})?)\s+(\d+(?:\.\d{2})?)\s+(\d+(?:\.\d{2})?)"
     transactions = re.findall(transaction_pattern, text)
 
     if transactions:
-        df = pd.DataFrame(transactions, columns=["Date", "Description", "Amount", "Type", "Balance"])
+        df = pd.DataFrame(transactions, columns=["Date", "Description", "Deposits", "Withdrawals", "Balance"])
     else:
         df = pd.DataFrame(columns=["Date", "Description", "Amount", "Type", "Balance"])
-
-    # ----------------------
-    # SHOW STRUCTURED DATA
-    # ----------------------
-    structured_data_regex = {
-        "Account Holder Details": account_holder,
-        "Bank Account Details": bank_details
-    }
-    st.subheader("📦 Structured Data (Regex Extraction)")
-    st.json(structured_data_regex)
 
     # ----------------------
     # VERTEX AI / GEMINI
     # ----------------------
     try:
         structured_data_ai = analyze_with_gemini(text)
+        
+        # Extract actual JSON from Gemini output
+        gemini_json_str = structured_data_ai.get("Gemini Output", "")
+        
+        # Remove markdown code blocks if present
+        gemini_json_str = gemini_json_str.replace("```json", "").replace("```", "").strip()
+        
+        # Load into a Python dict
+        import json
+        structured_data_ai = json.loads(gemini_json_str)
+        
         st.subheader("🤖 Structured Data (Gemini AI)")
-        st.json(structured_data_ai)
+        # st.json(structured_data_ai)
     except Exception as e:
-        st.error(f"Error calling Vertex AI: {e}")
-
+        st.error(f"Error parsing Gemini AI output: {e}")    
     # ----------------------
     # SHOW TRANSACTIONS TABLE
     # ----------------------
-    st.subheader("💰 Transactions Table")
-    if not df.empty:
-        st.dataframe(df)
-        csv_data = df.to_csv(index=False)
-        st.download_button(
-            label="📥 Download Transactions as CSV",
-            data=csv_data,
-            file_name="transactions.csv",
-            mime="text/csv"
-        )
+    # Account & Bank details cards
+    st.subheader("🏦 Account & Bank Details")
+    col1, col2 = st.columns(2)
+    with col1:
+        st.write("### Account Holder Details")
+        for k, v in structured_data_ai["Account Holder Details"].items():
+            st.write(f"**{k}:** {v}")
+    with col2:
+        st.write("### Bank Details")
+        for k, v in structured_data_ai["Bank Account Details"].items():
+            st.write(f"**{k}:** {v}")
+
+    # Transactions table
+    st.subheader("💰 Transactions Table (Gemini)")
+    transactions = structured_data_ai.get("Transactions", [])
+    if transactions:
+        df_ai = pd.DataFrame(transactions)
+        st.dataframe(df_ai)
+        csv_data = df_ai.to_csv(index=False)
+        st.download_button("📥 Download Transactions as CSV", csv_data, "transactions.csv")
     else:
-        st.warning("No transactions found. Check PDF format or update regex pattern.")
+        st.warning("No transactions found from Gemini AI")
